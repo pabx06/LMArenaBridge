@@ -25,7 +25,7 @@ This refactored version aims to provide a more stable, maintainable, and extensi
 
 ## ⚙️ Configuration File Guide
 
-The project's main behavior is controlled by `config.jsonc` and `model_endpoint_map.json`.
+The project's main behavior is controlled by [`config.jsonc`](./config.jsonc) and [`model_endpoint_map.json`](./model_endpoint_map.json).
 
 ### `config.jsonc` - Global Configuration
 
