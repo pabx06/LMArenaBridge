@@ -1,53 +1,53 @@
-# 🚀 LMArena Bridge - 新一代 OpenAI 桥接器 🌉
+# 🚀 LMArena Bridge - The Next-Gen OpenAI Bridge 🌉
 
-欢迎来到新一代的 LMArena Bridge！🎉 这是一个基于 FastAPI 和 WebSocket 的高性能工具集，它能让你通过任何兼容 OpenAI API 的客户端或应用程序，无缝使用 [LMArena.ai](https://lmarena.ai/) 平台上提供的海量大语言模型。
+Welcome to the new generation of LMArena Bridge! 🎉 This is a high-performance toolset based on FastAPI and WebSocket, allowing you to seamlessly use the vast array of large language models from [LMArena.ai](https://lmarena.ai/) through any client or application compatible with the OpenAI API.
 
-这个重构版本旨在提供更稳定、更易于维护和扩展的体验。
+This refactored version aims to provide a more stable, maintainable, and extensible experience.
 
-## ✨ 主要功能
+## ✨ Key Features
 
-*   **🚀 高性能后端**: 基于 **FastAPI** 和 **Uvicorn**，提供异步、高性能的 API 服务。
-*   **🔌 稳定的 WebSocket 通信**: 使用 WebSocket 替代 Server-Sent Events (SSE)，实现更可靠、低延迟的双向通信。
-*   **🤖 OpenAI 兼容接口**: 完全兼容 OpenAI `v1/chat/completions`、`v1/models` 以及 `v1/images/generations` 端点。
-*   **📎 通用文件上传**: 支持通过 Base64 上传任意类型的文件（图片、音频、PDF、代码等），并支持一次性上传多个文件。
-*   **🎨 文生图支持**: 新增文生图功能，可通过标准 OpenAI 接口调用 LMArena 的图像生成模型。
-*   **🗣️ 完整对话历史支持**: 自动将会话历史注入到 LMArena，实现有上下文的连续对话。
-*   **🌊 实时流式响应**: 像原生 OpenAI API 一样，实时接收来自模型的文本回应。
-*   **🔄 自动模型与程序更新**:
-    *   启动时自动从 LMArena 页面获取最新的模型列表，并智能更新 `models.json`。
-    *   启动时自动检查 GitHub 仓库，发现新版本时可自动下载并更新程序。
-*   **🆔 一键式会话ID更新**: 提供 `id_updater.py` 脚本，只需在浏览器操作一次，即可自动捕获并更新 `config.jsonc` 中所需的会话 ID。
-*   **⚙️ 浏览器自动化**: 配套的油猴脚本 (`LMArenaApiBridge.js`) 负责与后端服务器通信，并在浏览器中执行所有必要操作。
-*   **🍻 酒馆模式 (Tavern Mode)**: 专为 SillyTavern 等应用设计，智能合并 `system` 提示词，确保兼容性。
-*   **🤫 Bypass 模式**: 尝试通过在请求中额外注入一个空的用户消息，绕过平台的敏感词审查。
-*   **🔐 API Key 保护**: 可在配置文件中设置 API Key，为你的服务增加一层安全保障。
-*   **🎯 模型-会话高级映射**: 支持为不同模型配置独立的会话ID池，并能为每个会话指定特定的工作模式（如 `battle` 或 `direct_chat`），实现更精细的请求控制。
+*   **🚀 High-Performance Backend**: Based on **FastAPI** and **Uvicorn** to provide an asynchronous, high-performance API service.
+*   **🔌 Stable WebSocket Communication**: Uses WebSocket instead of Server-Sent Events (SSE) for more reliable, low-latency, two-way communication.
+*   **🤖 OpenAI-Compatible Interface**: Fully compatible with OpenAI's `v1/chat/completions`, `v1/models`, and `v1/images/generations` endpoints.
+*   **📎 Universal File Upload**: Supports uploading any file type (images, audio, PDFs, code, etc.) via Base64, including support for multiple files in a single request.
+*   **🎨 Text-to-Image Generation Support**: New text-to-image feature allows calling LMArena's image generation models through a standard OpenAI interface.
+*   **🗣️ Full Conversation History Support**: Automatically injects conversation history into LMArena to enable continuous, contextual dialogues.
+*   **🌊 Real-Time Streaming Response**: Receive text responses from the model in real-time, just like the native OpenAI API.
+*   **🔄 Automatic Model & Program Updates**:
+    *   Automatically fetches the latest model list from the LMArena page on startup and intelligently updates `models.json`.
+    *   Automatically checks the GitHub repository on startup and can download and apply updates when a new version is found.
+*   **🆔 One-Click Session ID Updater**: Provides an `id_updater.py` script that automatically captures and updates the required session IDs in `config.jsonc` after a single action in your browser.
+*   **⚙️ Browser Automation**: A companion userscript (`LMArenaApiBridge.js`) communicates with the backend server and performs all necessary actions within the browser.
+*   **🍻 Tavern Mode**: Specially designed for applications like SillyTavern, it intelligently merges `system` prompts to ensure compatibility.
+*   **🤫 Bypass Mode**: Attempts to bypass the platform's content filter by injecting an extra empty user message into the request.
+*   **🔐 API Key Protection**: You can set an API Key in the configuration file to add a layer of security to your service.
+*   **🎯 Advanced Model-Session Mapping**: Supports configuring independent session ID pools for different models and assigning specific working modes (`battle` or `direct_chat`) to each session for fine-grained request control.
 
-## ⚙️ 配置文件说明
+## ⚙️ Configuration File Guide
 
-项目的主要行为通过 `config.jsonc` 和 `model_endpoint_map.json` 进行控制。
+The project's main behavior is controlled by `config.jsonc` and `model_endpoint_map.json`.
 
-### `config.jsonc` - 全局配置
+### `config.jsonc` - Global Configuration
 
-这是主要的配置文件，包含了服务器的全局设置。
+This is the main configuration file containing the server's global settings.
 
-*   `session_id` / `message_id`: 全局默认的会话ID。当模型没有在 `model_endpoint_map.json` 中找到特定映射时，会使用这里的ID。
-*   `id_updater_last_mode` / `id_updater_battle_target`: 全局默认的请求模式。同样，当特定会话没有指定模式时，会使用这里的设置。
-*   `use_default_ids_if_mapping_not_found`: 一个非常重要的开关（默认为 `true`）。
-    *   `true`: 如果请求的模型在 `model_endpoint_map.json` 中找不到，就使用全局默认的ID和模式。
-    *   `false`: 如果找不到映射，则直接返回错误。这在你需要严格控制每个模型的会话时非常有用。
-*   其他配置项如 `api_key`, `tavern_mode_enabled` 等，请参考文件内的注释。
+*   `session_id` / `message_id`: The global default session IDs. These are used when a model does not have a specific mapping in `model_endpoint_map.json`.
+*   `id_updater_last_mode` / `id_updater_battle_target`: The global default request mode. Similarly, this is used when a specific session does not have a designated mode.
+*   `use_default_ids_if_mapping_not_found`: A very important switch (defaults to `true`).
+    *   `true`: If the requested model is not found in `model_endpoint_map.json`, the global default IDs and mode will be used.
+    *   `false`: If no mapping is found, an error is returned. This is useful when you need to strictly control the session for each model.
+*   For other configuration options like `api_key`, `tavern_mode_enabled`, etc., please refer to the comments within the file.
 
-### `model_endpoint_map.json` - 模型专属配置
+### `model_endpoint_map.json` - Model-Specific Configuration
 
-这是一个强大的高级功能，允许你覆盖全局配置，为特定的模型设置一个或多个专属的会话。
+This is a powerful advanced feature that allows you to override global settings and configure one or more dedicated sessions for specific models.
 
-**核心优势**:
-1.  **会话隔离**: 为不同的模型使用独立的会话，避免上下文串扰。
-2.  **提高并发**: 为热门模型配置一个ID池，程序会在每次请求时随机选择一个ID使用，模拟轮询，减少单个会话被频繁请求的风险。
-3.  **模式绑定**: 将一个会话ID与它被捕获时的模式（`direct_chat` 或 `battle`）绑定，确保请求格式永远正确。
+**Key Advantages**:
+1.  **Session Isolation**: Use separate sessions for different models to prevent context crosstalk.
+2.  **Increased Concurrency**: Configure an ID pool for popular models. The program will randomly select an ID for each request, simulating round-robin to reduce the risk of a single session being rate-limited.
+3.  **Mode Binding**: Bind a session ID to the mode it was captured in (`direct_chat` or `battle`) to ensure requests are always formatted correctly.
 
-**配置示例**:
+**Configuration Example**:
 ```json
 {
   "claude-3-opus-20240229": [
@@ -69,145 +69,145 @@
   }
 }
 ```
-*   **Opus**: 配置了一个ID池。请求时会随机选择其中一个，并严格按照其绑定的 `mode` 和 `battle_target` 来发送请求。
-*   **Gemini**: 使用了单个ID对象（旧格式，依然兼容）。由于它没有指定 `mode`，程序会自动使用 `config.jsonc` 中定义的全局模式。
+*   **Opus**: An ID pool is configured. When a request is made, one of the IDs will be chosen at random, and the request will strictly follow its bound `mode` and `battle_target`.
+*   **Gemini**: A single ID object is used (old format, still compatible). Since it does not specify a `mode`, the program will automatically use the global mode defined in `config.jsonc`.
 
-## 🛠️ 安装与使用
+## 🛠️ Installation and Usage
 
-你需要准备好 Python 环境和一款支持油猴脚本的浏览器 (如 Chrome, Firefox, Edge)。
+You will need a Python environment and a browser that supports userscripts (e.g., Chrome, Firefox, Edge).
 
-### 1. 准备工作
+### 1. Prerequisites
 
-*   **安装 Python 依赖**
-    打开终端，进入项目根目录，运行以下命令：
+*   **Install Python Dependencies**
+    Open a terminal, navigate to the project's root directory, and run the following command:
     ```bash
     pip install -r requirements.txt
     ```
 
-*   **安装油猴脚本管理器**
-    为你的浏览器安装 [Tampermonkey](https://www.tampermonkey.net/) 扩展。
+*   **Install a Userscript Manager**
+    Install the [Tampermonkey](https://www.tampermonkey.net/) extension for your browser.
 
-*   **安装本项目油猴脚本**
-    1.  打开 Tampermonkey 扩展的管理面板。
-    2.  点击“添加新脚本”或“Create a new script”。
-    3.  将 [`TampermonkeyScript/LMArenaApiBridge.js`](TampermonkeyScript/LMArenaApiBridge.js) 文件中的所有代码复制并粘贴到编辑器中。
-    4.  保存脚本。
+*   **Install This Project's Userscript**
+    1.  Open the Tampermonkey extension's dashboard.
+    2.  Click "Create a new script".
+    3.  Copy all the code from the [`TampermonkeyScript/LMArenaApiBridge.js`](TampermonkeyScript/LMArenaApiBridge.js) file and paste it into the editor.
+    4.  Save the script.
 
-### 2. 运行主程序
+### 2. Run the Main Program
 
-1.  **启动本地服务器**
-    在项目根目录下，运行主服务程序：
+1.  **Start the Local Server**
+    In the project's root directory, run the main server program:
     ```bash
     python api_server.py
     ```
-    当你看到服务器在 `http://127.0.0.1:5102` 启动的提示时，表示服务器已准备就绪。
+    When you see the server start on `http://127.0.0.1:5102`, it means the server is ready.
 
-2.  **保持 LMArena 页面开启**
-    确保你至少有一个 LMArena 页面是打开的，并且油猴脚本已成功连接到本地服务器（页面标题会以 `✅` 开头）。这里无需保持在对话页面，只要是域名下的页面都可以LeaderBoard都可以。
+2.  **Keep an LMArena Page Open**
+    Make sure you have at least one LMArena tab open and that the userscript has successfully connected to the local server (the page title will start with a `✅`). You don't need to stay on a chat page; any page on the LMArena domain, like the Leaderboard, will work.
 
-### 3. 配置会话 ID (需要时，一般只配置一次即可，除非切换模型或者原对话失效)
+### 3. Configure Session ID (Only needed once, unless switching models or the session expires)
 
-这是**最重要**的一步。你需要获取一个有效的会话 ID 和消息 ID，以便程序能够正确地与 LMArena API 通信。
+This is the **most important** step. You need to obtain a valid session ID and message ID so the program can communicate correctly with the LMArena API.
 
-1.  **确保主服务器正在运行**
-    `api_server.py` 必须处于运行状态，因为 ID 更新器需要通过它来激活浏览器的捕获功能。
+1.  **Ensure the Main Server is Running**
+    `api_server.py` must be running because the ID updater needs it to activate the capture mode in the browser.
 
-2.  **运行 ID 更新器**
-    打开**一个新的终端**，在项目根目录下运行 `id_updater.py` 脚本：
+2.  **Run the ID Updater**
+    Open a **new terminal**, and in the project's root directory, run the `id_updater.py` script:
     ```bash
     python id_updater.py
     ```
-    *   脚本会提示你选择模式 (DirectChat / Battle)。
-    *   选择后，它会通知正在运行的主服务器。
+    *   The script will prompt you to choose a mode (DirectChat / Battle).
+    *   After you choose, it will notify the running main server.
 
-3.  **激活与捕获**
-    *   此时，你应该会看到浏览器中 LMArena 页面的标题栏最前面出现了一个准星图标 (🎯)，这表示**ID捕获模式已激活**。
-    *   在浏览器中打开一个 LMArena 竞技场的 **目标模型发送给消息的页面**。请注意，如果是Battle页面，请不要查看模型名称，保持匿名状态，并保证当前消息界面的最后一条是目标模型的一个回答；如果是Direct Chat，请保证当前消息界面的最后一条是目标模型的一个回答。
-    *   **点击目标模型的回答卡片右上角的重试（Retry）按钮**。
-    *   油猴脚本会捕获到 `sessionId` 和 `messageId`，并将其发送给 `id_updater.py`。
+3.  **Activate and Capture**
+    *   At this point, you should see a crosshair icon (🎯) appear at the beginning of the title of the LMArena tab in your browser. This indicates that **ID capture mode is active**.
+    *   In the browser, navigate to a page where the **target model has sent a message**. Note: If it's a Battle page, do not reveal the model names; keep them anonymous and ensure the last message in the interface is a response from the target model. If it's a Direct Chat, ensure the last message is a response from the target model.
+    *   **Click the Retry button in the top-right corner of the target model's response card.**
+    *   The userscript will capture the `sessionId` and `messageId` and send them to `id_updater.py`.
 
-4.  **验证结果**
-    *   回到你运行 `id_updater.py` 的终端，你会看到它打印出成功捕获到的 ID，并提示已将其写入 `config.jsonc` 文件。
-    *   脚本在成功后会自动关闭。现在你的配置已完成！
+4.  **Verify the Result**
+    *   Go back to the terminal where you ran `id_updater.py`. You will see it print the successfully captured IDs and confirm that they have been written to the `config.jsonc` file.
+    *   The script will exit automatically upon success. Your configuration is now complete!
 
-3.  **配置你的 OpenAI 客户端**
-    将你的客户端或应用的 OpenAI API 地址指向本地服务器：
+3.  **Configure Your OpenAI Client**
+    Point your client or application's OpenAI API address to the local server:
     *   **API Base URL**: `http://127.0.0.1:5102/v1`
-    *   **API Key**: 如果 `config.jsonc` 中的 `api_key` 为空，则可随便输入；如果已设置，则必须提供正确的 Key。
-    *   **Model Name**: 模型现在不再由本地决定，而是由你再LMArena对话中，重试（Retry）的那条消息所决定。所以务必提前在对话或者Battle中找到你想要的模型的对话。DirectChat可以使用DC大佬提供的**LMArenaDirectChat模型注入 (仙之人兮列如麻) V5.js**这个油猴脚本来确定你想用的模型（wolfstride等最新测试模型可能无法直接对话，必须在Battle里进行捕捉）。
+    *   **API Key**: If `api_key` in `config.jsonc` is empty, you can enter anything. If it is set, you must provide the correct key.
+    *   **Model Name**: The model is no longer determined locally. It is determined by the message you clicked "Retry" on in your LMArena conversation. Therefore, make sure to find a conversation with your desired model in either Direct Chat or Battle beforehand. For Direct Chat, you can use the userscript **LMArenaDirectChat模型注入 (仙之人兮列如麻) V5.js** provided by DC big shots to select your model (the newest test models like wolfstride may not be available for direct chat and must be captured in Battle).
 
-4.  **开始聊天！** 💬
-    现在你可以正常使用你的客户端了，所有的请求都会通过本地服务器代理到 LMArena 上！
+4.  **Start Chatting!** 💬
+    You can now use your client as usual. All requests will be proxied through the local server to LMArena!
 
-## 🤔 它是如何工作的？
+## 🤔 How Does It Work?
 
-这个项目由两部分组成：一个本地 Python **FastAPI** 服务器和一个在浏览器中运行的**油猴脚本**。它们通过 **WebSocket** 协同工作。
+This project consists of two parts: a local Python **FastAPI** server and a **userscript** running in the browser. They work together via **WebSocket**.
 
 ```mermaid
 sequenceDiagram
-    participant C as OpenAI 客户端 💻
-    participant S as 本地 FastAPI 服务器 🐍
-    participant U as ID 更新脚本 (id_updater.py) 🆔
-    participant T as 油猴脚本 🐵 (在 LMArena 页面)
+    participant C as OpenAI Client 💻
+    participant S as Local FastAPI Server 🐍
+    participant U as ID Updater Script (id_updater.py) 🆔
+    participant T as Userscript 🐵 (in LMArena page)
     participant L as LMArena.ai 🌐
 
-    alt 初始化与ID更新
-        T->>+S: (页面加载) 建立 WebSocket 连接
-        S-->>-T: 确认连接
-        U->>+S: (用户运行) POST /internal/start_id_capture
-        S->>T: (WebSocket) 发送 'activate_id_capture' 指令
-        Note right of T: 捕获模式已激活 (一次性)
-        T->>L: (用户点击Retry) 拦截到 fetch 请求
-        T->>U: (HTTP) 发送捕获到的ID
-        U-->>T: 确认
-        U->>U: 更新 config.jsonc
+    alt Initialization & ID Update
+        T->>+S: (Page Load) Establish WebSocket connection
+        S-->>-T: Confirm connection
+        U->>+S: (User runs) POST /internal/start_id_capture
+        S->>T: (WebSocket) Send 'activate_id_capture' command
+        Note right of T: Capture mode activated (one-time)
+        T->>L: (User clicks Retry) Intercepts fetch request
+        T->>U: (HTTP) Send captured IDs
+        U-->>T: Acknowledge
+        U->>U: Update config.jsonc
     end
 
-    alt 正常聊天流程
-        C->>+S: (用户聊天) /v1/chat/completions 请求
-        S->>S: 转换请求为 LMArena 格式
-        S->>T: (WebSocket) 发送包含 request_id 和载荷的消息
-        T->>L: (fetch) 发送真实请求到 LMArena API
-        L-->>T: (流式)返回模型响应
-        T->>S: (WebSocket) 将响应数据块一块块发回
-        S-->>-C: (流式) 返回 OpenAI 格式的响应
+    alt Normal Chat Flow
+        C->>+S: (User chats) /v1/chat/completions request
+        S->>S: Convert request to LMArena format
+        S->>T: (WebSocket) Send message with request_id and payload
+        T->>L: (fetch) Send real request to LMArena API
+        L-->>T: (Streaming) returns model response
+        T->>S: (WebSocket) Send response chunks back
+        S-->>-C: (Streaming) Return OpenAI-formatted response
     end
 
-    alt 文生图流程
-        C->>+S: (用户请求) /v1/images/generations 请求
-        S->>S: (并行) 创建 n 个任务
-        S->>T: (WebSocket) 发送 n 个包含 request_id 的任务
-        T->>L: (fetch) 发送 n 个真实请求
-        L-->>T: (流式) 返回图片 URL
-        T->>S: (WebSocket) 将 URL 发回
-        S-->>-C: (HTTP) 返回包含所有 URL 的 JSON 响应
+    alt Image Generation Flow
+        C->>+S: (User requests) /v1/images/generations request
+        S->>S: (Parallel) Create n tasks
+        S->>T: (WebSocket) Send n tasks with request_id
+        T->>L: (fetch) Send n real requests
+        L-->>T: (Streaming) Return image URL
+        T->>S: (WebSocket) Send URL back
+        S-->>-C: (HTTP) Return JSON response with all URLs
     end
 ```
 
-1.  **建立连接**: 当你在浏览器中打开 LMArena 页面时，**油猴脚本**会立即与**本地 FastAPI 服务器**建立一个持久的 **WebSocket 连接**。
-    > **注意**: 当前架构假定只有一个浏览器标签页在工作。如果打开多个页面，只有最后一个连接会生效。
-2.  **接收请求**: **OpenAI 客户端**向本地服务器发送标准的聊天请求。
-3.  **任务分发**: 服务器接收到请求后，会将其转换为 LMArena 需要的格式，并附上一个唯一的请求 ID (`request_id`)，然后通过 WebSocket 将这个任务发送给已连接的油猴脚本。
-4.  **执行与响应**: 油猴脚本收到任务后，会直接向 LMArena 的 API 端点发起 `fetch` 请求。当 LMArena 返回流式响应时，油猴脚本会捕获这些数据块，并将它们一块块地通过 WebSocket 发回给本地服务器。
-5.  **响应中继**: 服务器根据每块数据附带的 `request_id`，将其放入正确的响应队列中，并实时地将这些数据流式传输回 OpenAI 客户端。
+1.  **Establish Connection**: When you open an LMArena page in your browser, the **userscript** immediately establishes a persistent **WebSocket connection** with the **local FastAPI server**.
+    > **Note**: The current architecture assumes only one browser tab is active. If multiple pages are open, only the last connection will be effective.
+2.  **Receive Request**: The **OpenAI client** sends a standard chat request to the local server.
+3.  **Task Distribution**: The server receives the request, converts it to the format LMArena requires, attaches a unique request ID (`request_id`), and sends this task to the connected userscript via WebSocket.
+4.  **Execution and Response**: Upon receiving the task, the userscript initiates a `fetch` request directly to LMArena's API endpoint. As LMArena returns a streaming response, the userscript captures these data chunks and sends them back to the local server, piece by piece, via WebSocket.
+5.  **Response Relay**: The server uses the `request_id` attached to each chunk to place it in the correct response queue and streams this data back to the OpenAI client in real-time.
 
-## 📖 API 端点
+## 📖 API Endpoints
 
-### 获取模型列表
+### Get Model List
 
-*   **端点**: `GET /v1/models`
-*   **描述**: 返回一个与 OpenAI 兼容的模型列表，该列表从 `models.json` 文件中读取。
+*   **Endpoint**: `GET /v1/models`
+*   **Description**: Returns an OpenAI-compatible list of models, read from the `models.json` file.
 
-### 聊天补全
+### Chat Completions
 
-*   **端点**: `POST /v1/chat/completions`
-*   **描述**: 接收标准的 OpenAI 聊天请求，支持流式和非流式响应。
+*   **Endpoint**: `POST /v1/chat/completions`
+*   **Description**: Accepts standard OpenAI chat requests, supporting both streaming and non-streaming responses.
 
-### 图像生成
+### Image Generation
 
-*   **端点**: `POST /v1/images/generations`
-*   **描述**: 接收标准的 OpenAI 文生图请求，返回生成的图片 URL。
-*   **请求示例**:
+*   **Endpoint**: `POST /v1/images/generations`
+*   **Description**: Accepts standard OpenAI text-to-image requests and returns the generated image URLs.
+*   **Request Example**:
     ```bash
     curl http://127.0.0.1:5102/v1/images/generations \
       -H "Content-Type: application/json" \
@@ -217,7 +217,7 @@ sequenceDiagram
         "model": "dall-e-3"
       }'
     ```
-*   **响应示例**:
+*   **Response Example**:
     ```json
     {
       "created": 1677663338,
@@ -232,23 +232,23 @@ sequenceDiagram
     }
     ```
 
-## 📂 文件结构
+## 📂 File Structure
 
 ```
 .
-├── .gitignore                  # Git 忽略文件
-├── api_server.py               # 核心后端服务 (FastAPI) 🐍
-├── id_updater.py               # 一键式会话ID更新脚本 🆔
-├── models.json                 # 模型名称到 LMArena 内部 ID 的映射表 🗺️
-├── model_endpoint_map.json     # [高级] 模型到专属会话ID的映射表 🎯
-├── requirements.txt            # Python 依赖包列表 📦
-├── README.md                   # 就是你现在正在看的这个文件 👋
-├── config.jsonc                # 全局功能配置文件 ⚙️
+├── .gitignore                  # Git ignore file
+├── api_server.py               # Core backend service (FastAPI) 🐍
+├── id_updater.py               # One-click Session ID updater script 🆔
+├── models.json                 # Maps model names to LMArena internal IDs 🗺️
+├── model_endpoint_map.json     # [Advanced] Maps models to dedicated session IDs 🎯
+├── requirements.txt            # Python dependency list 📦
+├── README.md                   # The file you are reading right now 👋
+├── config.jsonc                # Global feature configuration file ⚙️
 ├── modules/
-│   ├── image_generation.py     # 文生图模块 🎨
-│   └── update_script.py        # 自动更新逻辑脚本 🔄
+│   ├── image_generation.py     # Image generation module 🎨
+│   └── update_script.py        # Auto-update logic script 🔄
 └── TampermonkeyScript/
-    └── LMArenaApiBridge.js     # 前端自动化油猴脚本 🐵
+    └── LMArenaApiBridge.js     # Frontend automation userscript 🐵
 ```
 
-**享受在 LMArena 的模型世界中自由探索的乐趣吧！** 💖
+**Enjoy exploring the world of models on LMArena!** 💖
